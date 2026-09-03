@@ -19,7 +19,7 @@ public class UnitManager : MonoBehaviour
     {
         foreach (UnitSO unit in availableUnits)
         {
-            UnitUICard card = Instantiate(unitUICard, unitUIShopParent);
+            UnitUICard card = Instantiate(unitUICard, unitUIShopParent.transform);
             card.gameObject.SetActive(true);
             card.SetUnit(unit);
         }

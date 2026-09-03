@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Attack Unit
   m_EditorClassIdentifier: 
   unitName: Attack Unit
+  sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
   prefab: {fileID: 5509300971355098516, guid: 0c6183f96bea93a4a961a949680bd526, type: 3}
   maxHealth: 50
   attack: 5
@@ -20,4 +21,4 @@ MonoBehaviour:
   attacksPerSecond: 5
   goldProduced: 0
   goldProductionInterval: 0
-  cost: 10
+  cost: 1

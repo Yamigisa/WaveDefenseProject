@@ -41,4 +41,19 @@ public class GridManager : MonoBehaviour
         }
         return null;
     }
+
+    public Tile GetTileAtWorldPosition(Vector3 worldPosition)
+    {
+        Vector2 gridPosition = new Vector2(
+            Mathf.FloorToInt(worldPosition.x + 0.5f),
+            Mathf.FloorToInt(worldPosition.y + 0.5f));
+
+        return GetTilePosition(gridPosition);
+    }
+
+    public void SetPlacementPreview(bool isActive)
+    {
+        foreach (Tile tile in tiles.Values)
+            tile.SetPlacementPreview(isActive);
+    }
 }
