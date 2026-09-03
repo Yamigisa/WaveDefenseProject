@@ -13,6 +13,7 @@ public class PlacementSystem : MonoBehaviour
 
     private UnitSO selectedUnit;
     private GameObject ghostUnit;
+    private UnitObject ghostUnitObject;
     private Tile hoveredTile;
     private readonly Dictionary<SpriteRenderer, Color> ghostSpriteColors = new();
 
@@ -48,6 +49,10 @@ public class PlacementSystem : MonoBehaviour
         selectedUnit = unit;
         ghostUnit = Instantiate(selectedUnit.prefab);
         ConfigureGhost(ghostUnit);
+        ghostUnitObject = ghostUnit.GetComponent<UnitObject>();
+        if (ghostUnitObject != null)
+            ghostUnitObject.SetAttackRangeVisible(true);
+
         gridManager.SetPlacementPreview(true);
     }
 
@@ -56,11 +61,15 @@ public class PlacementSystem : MonoBehaviour
         if (gridManager != null)
             gridManager.SetPlacementPreview(false);
 
+        if (ghostUnitObject != null)
+            ghostUnitObject.SetAttackRangeVisible(false);
+
         if (ghostUnit != null)
             Destroy(ghostUnit);
 
         ghostSpriteColors.Clear();
         ghostUnit = null;
+        ghostUnitObject = null;
         selectedUnit = null;
         hoveredTile = null;
     }
@@ -72,14 +81,23 @@ public class PlacementSystem : MonoBehaviour
 
         hoveredTile = gridManager.GetTileAtWorldPosition(mouseWorldPosition);
         bool isOverGrid = hoveredTile != null;
+        gridManager.SetPlacementPreviewTile(hoveredTile);
 
         ghostUnit.SetActive(isOverGrid);
 
         if (!isOverGrid)
+        {
+            if (ghostUnitObject != null)
+                ghostUnitObject.SetAttackRangeVisible(false);
+
             return;
+        }
 
         ghostUnit.transform.position = hoveredTile.transform.position;
         SetGhostColor(!hoveredTile.IsOccupied);
+
+        if (ghostUnitObject != null)
+            ghostUnitObject.SetAttackRangeVisible(true);
     }
 
     private void TryPlaceSelectedUnit()

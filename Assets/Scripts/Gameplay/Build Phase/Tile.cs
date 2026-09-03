@@ -8,8 +8,12 @@ public class Tile : MonoBehaviour
     [SerializeField] private Color validPlacementColor = new(0.35f, 0.9f, 0.35f, 1f);
     [SerializeField] private Color invalidPlacementColor = new(0.9f, 0.35f, 0.35f, 1f);
 
+    [Header("Attack Range Preview")]
+    [SerializeField] private Color attackRangeColor = new(0.3f, 0.65f, 1f, 1f);
+
     private bool isOccupied = false;
     private bool isShowingPlacementPreview;
+    private bool isShowingAttackRangePreview;
     private Color defaultColor;
 
     public bool IsOccupied => isOccupied;
@@ -25,6 +29,12 @@ public class Tile : MonoBehaviour
         RefreshColor();
     }
 
+    public void SetAttackRangePreview(bool isActive)
+    {
+        isShowingAttackRangePreview = isActive;
+        RefreshColor();
+    }
+
     public void SetOccupied(bool value)
     {
         isOccupied = value;
@@ -36,8 +46,12 @@ public class Tile : MonoBehaviour
         if (spriteRenderer == null)
             return;
 
-        spriteRenderer.color = isShowingPlacementPreview
-            ? isOccupied ? invalidPlacementColor : validPlacementColor
-            : defaultColor;
+        if (isShowingPlacementPreview)
+        {
+            spriteRenderer.color = isOccupied ? invalidPlacementColor : validPlacementColor;
+            return;
+        }
+
+        spriteRenderer.color = isShowingAttackRangePreview ? attackRangeColor : defaultColor;
     }
 }

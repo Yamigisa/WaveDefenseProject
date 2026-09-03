@@ -10,20 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ed809740180443247b3dfa680529ee37, type: 3}
-  m_Name: Attack Unit
+  m_Name: Enemy Unit
   m_EditorClassIdentifier: 
-  unitName: Attack Unit
+  unitName: Enemy Unit
   sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
   prefab: {fileID: 5509300971355098516, guid: 0c6183f96bea93a4a961a949680bd526, type: 3}
-  maxHealth: 50
-  attack: 5
-  attackAreaWidth: 5
-  attackAreaHeight: 5
+  maxHealth: 2
+  attack: 0
+  attackAreaWidth: 1
+  attackAreaHeight: 1
   maxTargets: 1
-  attacksPerSecond: 5
-  projectilePrefab: {fileID: 0}
-  projectileSpeed: 4
-  projectileLifetime: 3
+  attacksPerSecond: 0
   goldProduced: 0
   goldProductionInterval: 0
   cost: 1
