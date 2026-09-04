@@ -10,6 +10,9 @@ public class GridManager : MonoBehaviour
     [Header("Tile Settings")]
     [SerializeField] private Tile tilePrefab;
 
+    [Header("Enemy Destination")]
+    [Min(1)] [SerializeField] private int enemyDestinationMaxHealth = 20;
+
     private Dictionary<Vector2, Tile> tiles = new Dictionary<Vector2, Tile>();
     private readonly List<Tile> attackRangePreviewTiles = new();
     private Tile previewTile;
@@ -33,6 +36,7 @@ public class GridManager : MonoBehaviour
     private void Start()
     {
         GenerateGrid();
+        SpawnEnemyDestination();
     }
 
     private void GenerateGrid()
@@ -67,6 +71,22 @@ public class GridManager : MonoBehaviour
             Mathf.FloorToInt(worldPosition.y + 0.5f));
 
         return GetTilePosition(gridPosition);
+    }
+
+    private void SpawnEnemyDestination()
+    {
+        Vector2Int centerCell = new(width / 2, height / 2);
+        Tile centerTile = GetTilePosition(centerCell);
+        if (centerTile == null)
+            return;
+
+        GameObject destination = new("Enemy Destination");
+        destination.transform.SetParent(transform);
+        destination.transform.position = centerTile.transform.position;
+        destination.name = "Enemy Destination";
+        EnemyDestination destinationComponent = destination.AddComponent<EnemyDestination>();
+        destinationComponent.Initialize(enemyDestinationMaxHealth);
+        centerTile.SetOccupied(true);
     }
 
     public void SetPlacementPreview(bool isActive)

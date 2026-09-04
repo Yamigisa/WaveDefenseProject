@@ -1,25 +1,19 @@
 using UnityEngine;
 
-/// <summary>
-/// Moves towards one enemy, damages it on arrival, then destroys itself.
-/// A Collider2D is optional because distance-based contact is always checked.
-/// </summary>
 public class Projectile : MonoBehaviour
 {
     [SerializeField] private float hitDistance = 0.1f;
 
-    private UnitObject target;
-    private UnitTeam ownerTeam;
+    private Health target;
     private int damage;
     private float moveSpeed;
     private bool hasHit;
     private Vector3 travelDirection;
 
-    public void Initialize(UnitObject newTarget, UnitTeam newOwnerTeam, int newDamage,
+    public void Initialize(Health newTarget, int newDamage,
         float newMoveSpeed, float lifetime)
     {
         target = newTarget;
-        ownerTeam = newOwnerTeam;
         damage = newDamage;
         moveSpeed = newMoveSpeed;
 
@@ -69,13 +63,13 @@ public class Projectile : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        UnitObject hitUnit = other.GetComponentInParent<UnitObject>();
+        Health hitUnit = other.GetComponentInParent<Health>();
 
-        if (!hasHit && hitUnit != null && hitUnit.Team != ownerTeam)
+        if (!hasHit && hitUnit != null && hitUnit == target)
             HitTarget(hitUnit);
     }
 
-    private void HitTarget(UnitObject hitUnit)
+    private void HitTarget(Health hitUnit)
     {
         hasHit = true;
         hitUnit.TakeDamage(damage);

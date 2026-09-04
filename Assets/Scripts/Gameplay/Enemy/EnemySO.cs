@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Unit", menuName = "ScriptableObjects/Unit")]
-public class UnitSO : ScriptableObject
+[CreateAssetMenu(fileName = "New Enemy", menuName = "ScriptableObjects/Enemy")]
+public class EnemySO : ScriptableObject
 {
     [Header("Identity")]
     public string unitName;
@@ -11,12 +11,19 @@ public class UnitSO : ScriptableObject
     [Header("Defense")]
     public int maxHealth;
 
+    [Header("Movement")]
+    public int moveSpeed;
+
+    [Header("Destination")]
+    [Tooltip("Damage dealt to the destination when this enemy reaches it. The enemy is then removed.")]
+    [Min(1)]
+    public int destinationDamage = 1;
+
     [Header("Attack")]
     public int attack;
 
     [Tooltip("Projectile attacks can damage targets at tile range. Melee attacks only damage opposing colliders in contact.")]
     public AttackType attackType = AttackType.Projectile;
-
     [Tooltip("Width of the tile-based attack area. Use an odd value so the unit sits at the centre of the area.")]
     [Min(1)]
     public int attackAreaWidth = 5;
@@ -25,11 +32,10 @@ public class UnitSO : ScriptableObject
     [Min(1)]
     public int attackAreaHeight = 5;
 
-    [Tooltip("How many enemies this unit attacks during one attack cycle.")]
+    [Tooltip("How many defenders this enemy attacks during one attack cycle.")]
     [Min(1)]
     public int maxTargets = 1;
 
-    [Tooltip("Number of attacks this unit can perform per second.")]
     public float attacksPerSecond;
 
     [Header("Projectile")]
@@ -43,17 +49,5 @@ public class UnitSO : ScriptableObject
     [Min(0.1f)]
     [Tooltip("Safety lifetime in seconds before an unhit projectile is destroyed.")]
     public float projectileLifetime = 3f;
-
-    [Header("Economy")]
-    [Tooltip("Gold produced each time this unit's production timer completes.")]
-    [Min(0)]
-    public int goldProduced;
-
-    [Tooltip("Seconds between Gold production. Units with no Gold production ignore this value.")]
-    [Min(0.01f)]
-    public float goldProductionInterval;
-
-    [Header("Cost")]
-    public int cost;
 
 }
