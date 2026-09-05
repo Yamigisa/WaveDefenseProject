@@ -27,6 +27,8 @@ public class UnitUICard : MonoBehaviour
     {
         if (ResourceManager.Instance != null)
             ResourceManager.Instance.ResourceChanged += HandleResourceChanged;
+        if (GamePhaseManager.Instance != null)
+            GamePhaseManager.Instance.PhaseChanged += HandlePhaseChanged;
 
         RefreshBuyButton();
     }
@@ -35,6 +37,8 @@ public class UnitUICard : MonoBehaviour
     {
         if (ResourceManager.Instance != null)
             ResourceManager.Instance.ResourceChanged -= HandleResourceChanged;
+        if (GamePhaseManager.Instance != null)
+            GamePhaseManager.Instance.PhaseChanged -= HandlePhaseChanged;
     }
 
     public void SetUnit(UnitSO _unitSO)
@@ -51,11 +55,14 @@ public class UnitUICard : MonoBehaviour
             RefreshBuyButton();
     }
 
+    private void HandlePhaseChanged(GamePhase phase) => RefreshBuyButton();
+
     private void RefreshBuyButton()
     {
         bool canAfford = unitSO != null &&
             ResourceManager.Instance != null &&
-            ResourceManager.Instance.GetAmount(ResourceType.Gold) >= unitSO.cost;
+            ResourceManager.Instance.GetAmount(ResourceType.Gold) >= unitSO.cost &&
+            (GamePhaseManager.Instance == null || GamePhaseManager.Instance.IsBuildPhase);
 
         buyUnitButton.interactable = canAfford;
         cardCanvasGroup.alpha = canAfford ? 1f : unaffordableAlpha;
@@ -63,7 +70,8 @@ public class UnitUICard : MonoBehaviour
 
     public void SelectUnit()
     {
-        if (unitSO == null || ResourceManager.Instance == null ||
+        if ((GamePhaseManager.Instance != null && !GamePhaseManager.Instance.IsBuildPhase) ||
+            unitSO == null || ResourceManager.Instance == null ||
             ResourceManager.Instance.GetAmount(ResourceType.Gold) < unitSO.cost)
             return;
 

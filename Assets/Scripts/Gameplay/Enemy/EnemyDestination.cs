@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 
+[RequireComponent(typeof(Health), typeof(CircleCollider2D))]
 public class EnemyDestination : MonoBehaviour
 {
     public static EnemyDestination Instance { get; private set; }
@@ -14,10 +15,10 @@ public class EnemyDestination : MonoBehaviour
     public void Initialize(int maxHealth)
     {
         this.maxHealth = Mathf.Max(1, maxHealth);
-        health = GetComponent<Health>() ?? gameObject.AddComponent<Health>();
+        health = GetComponent<Health>();
         health.Initialize(this.maxHealth);
 
-        CircleCollider2D trigger = GetComponent<CircleCollider2D>() ?? gameObject.AddComponent<CircleCollider2D>();
+        CircleCollider2D trigger = GetComponent<CircleCollider2D>();
         trigger.isTrigger = true;
 
         CreateHealthUi();

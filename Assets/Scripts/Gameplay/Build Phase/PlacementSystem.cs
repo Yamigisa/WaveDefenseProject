@@ -44,6 +44,9 @@ public class PlacementSystem : MonoBehaviour
 
     public void StartPlacement(UnitSO unit)
     {
+        if (GamePhaseManager.Instance != null && !GamePhaseManager.Instance.IsBuildPhase)
+            return;
+
         CancelPlacement();
 
         selectedUnit = unit;
@@ -80,13 +83,15 @@ public class PlacementSystem : MonoBehaviour
         mouseWorldPosition.z = 0f;
 
         hoveredTile = gridManager.GetTileAtWorldPosition(mouseWorldPosition);
-        bool isOverGrid = hoveredTile != null;
         gridManager.SetPlacementPreviewTile(hoveredTile);
 
-        ghostUnit.SetActive(isOverGrid);
-
-        if (!isOverGrid)
+        if (hoveredTile == null)
         {
+            // Keep the preview following the cursor outside the grid, but mark it
+            // invalid so it cannot be mistaken for a placeable position.
+            ghostUnit.transform.position = mouseWorldPosition;
+            SetGhostColor(false);
+
             if (ghostUnitObject != null)
                 ghostUnitObject.SetAttackRangeVisible(false);
 
@@ -102,6 +107,9 @@ public class PlacementSystem : MonoBehaviour
 
     private void TryPlaceSelectedUnit()
     {
+        if (GamePhaseManager.Instance != null && !GamePhaseManager.Instance.IsBuildPhase)
+            return;
+
         if (hoveredTile == null || hoveredTile.IsOccupied || selectedUnit == null)
             return;
 

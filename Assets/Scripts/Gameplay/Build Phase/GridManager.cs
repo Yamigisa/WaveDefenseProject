@@ -11,6 +11,7 @@ public class GridManager : MonoBehaviour
     [SerializeField] private Tile tilePrefab;
 
     [Header("Enemy Destination")]
+    [SerializeField] private EnemyDestination enemyDestinationPrefab;
     [Min(1)] [SerializeField] private int enemyDestinationMaxHealth = 20;
 
     private Dictionary<Vector2, Tile> tiles = new Dictionary<Vector2, Tile>();
@@ -73,18 +74,40 @@ public class GridManager : MonoBehaviour
         return GetTilePosition(gridPosition);
     }
 
+    public Vector2Int GetEdgeCell(GridEdge edge, int laneIndex)
+    {
+        switch (edge)
+        {
+            case GridEdge.Top:
+                return new Vector2Int(Mathf.Clamp(laneIndex, 0, width - 1), height - 1);
+            case GridEdge.Left:
+                return new Vector2Int(0, Mathf.Clamp(laneIndex, 0, height - 1));
+            case GridEdge.Right:
+                return new Vector2Int(width - 1, Mathf.Clamp(laneIndex, 0, height - 1));
+            default:
+                return new Vector2Int(Mathf.Clamp(laneIndex, 0, width - 1), 0);
+        }
+    }
+
     private void SpawnEnemyDestination()
     {
+        if (enemyDestinationPrefab == null)
+        {
+            Debug.LogError("GridManager is missing an Enemy Destination prefab.", this);
+            return;
+        }
+
         Vector2Int centerCell = new(width / 2, height / 2);
         Tile centerTile = GetTilePosition(centerCell);
         if (centerTile == null)
             return;
 
-        GameObject destination = new("Enemy Destination");
-        destination.transform.SetParent(transform);
-        destination.transform.position = centerTile.transform.position;
-        destination.name = "Enemy Destination";
-        EnemyDestination destinationComponent = destination.AddComponent<EnemyDestination>();
+        EnemyDestination destinationComponent = Instantiate(
+            enemyDestinationPrefab,
+            centerTile.transform.position,
+            Quaternion.identity,
+            transform);
+        destinationComponent.name = "Enemy Destination";
         destinationComponent.Initialize(enemyDestinationMaxHealth);
         centerTile.SetOccupied(true);
     }

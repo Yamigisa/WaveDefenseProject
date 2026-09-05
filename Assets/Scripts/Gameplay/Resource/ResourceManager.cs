@@ -11,6 +11,7 @@ public class ResourceManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI diamondText;
 
     [Header("Gold Regeneration")]
+    [Min(0)] [SerializeField] private int startingGold = 10;
     [Min(0)] [SerializeField] private int goldPerRegen = 1;
     [Min(0.01f)] [SerializeField] private float goldRegenInterval = 1f;
 
@@ -28,13 +29,13 @@ public class ResourceManager : MonoBehaviour
         Instance = this;
         amounts[ResourceType.Gold] = 0;
         amounts[ResourceType.Diamond] = 0;
+        Add(ResourceType.Gold, startingGold);
     }
 
     private void OnEnable()
     {
         ResourceChanged += UpdateResourceText;
         RefreshResourceTexts();
-        goldRegenCoroutine = StartCoroutine(RegenerateGold());
     }
 
     private void OnDisable()
@@ -63,6 +64,17 @@ public class ResourceManager : MonoBehaviour
         ResourceChanged?.Invoke(type, amounts[type]);
 
         return true;
+    }
+
+    public void SetGoldRegenerationActive(bool isActive)
+    {
+        if (isActive && goldRegenCoroutine == null)
+            goldRegenCoroutine = StartCoroutine(RegenerateGold());
+        else if (!isActive && goldRegenCoroutine != null)
+        {
+            StopCoroutine(goldRegenCoroutine);
+            goldRegenCoroutine = null;
+        }
     }
 
     private void RefreshResourceTexts()

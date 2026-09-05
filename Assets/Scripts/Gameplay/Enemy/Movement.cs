@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class Movement : MonoBehaviour
 {
@@ -7,6 +8,8 @@ public class Movement : MonoBehaviour
     private Rigidbody2D body;
     private Transform destination;
     private bool isBlocked;
+    private readonly List<Vector2> waypoints = new();
+    private int waypointIndex;
 
     private void Awake()
     {
@@ -30,7 +33,20 @@ public class Movement : MonoBehaviour
 
     public void SetDestination(Transform newDestination)
     {
+        if (waypoints.Count > 0)
+            return;
+
         destination = newDestination;
+    }
+
+    public void SetWaypoints(params Vector2[] newWaypoints)
+    {
+        waypoints.Clear();
+        foreach (Vector2 waypoint in newWaypoints)
+            waypoints.Add(waypoint);
+
+        waypointIndex = 0;
+        destination = null;
     }
 
     public void SetBlocked(bool blocked)
@@ -43,12 +59,33 @@ public class Movement : MonoBehaviour
         if (body == null || isBlocked || moveSpeed <= 0f)
             return;
 
-        if (destination != null)
-            SetDirection((Vector2)(destination.position - transform.position));
+        Vector2 targetPosition;
+        if (waypointIndex < waypoints.Count)
+        {
+            targetPosition = waypoints[waypointIndex];
+            if (Vector2.Distance(body.position, targetPosition) <= 0.01f)
+            {
+                waypointIndex++;
+                if (waypointIndex >= waypoints.Count)
+                    return;
+
+                targetPosition = waypoints[waypointIndex];
+            }
+        }
+        else if (destination != null)
+        {
+            targetPosition = destination.position;
+        }
+        else
+        {
+            targetPosition = body.position + moveDirection;
+        }
+
+        SetDirection(targetPosition - body.position);
 
         if (moveDirection == Vector2.zero)
             return;
 
-        body.MovePosition(body.position + moveDirection * moveSpeed * Time.fixedDeltaTime);
+        body.MovePosition(Vector2.MoveTowards(body.position, targetPosition, moveSpeed * Time.fixedDeltaTime));
     }
 }

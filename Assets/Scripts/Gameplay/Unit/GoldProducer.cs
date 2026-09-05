@@ -11,16 +11,35 @@ public class GoldProducer : MonoBehaviour
     {
         goldPerInterval = newGoldPerInterval;
         interval = newInterval;
-        if (productionCoroutine != null)
-            StopCoroutine(productionCoroutine);
-        if (goldPerInterval > 0 && interval > 0f)
-            productionCoroutine = StartCoroutine(ProduceGold());
+    }
+
+    private void OnEnable()
+    {
+        if (GamePhaseManager.Instance != null)
+            GamePhaseManager.Instance.PhaseChanged += HandlePhaseChanged;
+
+        SetProductionActive(GamePhaseManager.Instance != null && !GamePhaseManager.Instance.IsBuildPhase);
     }
 
     private void OnDisable()
     {
-        StopCoroutine(productionCoroutine);
-        productionCoroutine = null;
+        if (GamePhaseManager.Instance != null)
+            GamePhaseManager.Instance.PhaseChanged -= HandlePhaseChanged;
+
+        SetProductionActive(false);
+    }
+
+    private void HandlePhaseChanged(GamePhase phase) => SetProductionActive(phase == GamePhase.Combat);
+
+    private void SetProductionActive(bool isActive)
+    {
+        if (isActive && productionCoroutine == null && goldPerInterval > 0 && interval > 0f)
+            productionCoroutine = StartCoroutine(ProduceGold());
+        else if (!isActive && productionCoroutine != null)
+        {
+            StopCoroutine(productionCoroutine);
+            productionCoroutine = null;
+        }
     }
 
     private IEnumerator ProduceGold()

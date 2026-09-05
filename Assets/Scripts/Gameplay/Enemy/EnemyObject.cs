@@ -4,6 +4,7 @@ using UnityEngine;
 [RequireComponent(typeof(Movement))]
 public class EnemyObject : MonoBehaviour
 {
+    public event System.Action<EnemyObject> Destroyed;
     [SerializeField] private EnemySO enemySO;
     [SerializeField] private Vector2 initialMoveDirection = Vector2.left;
 
@@ -11,6 +12,7 @@ public class EnemyObject : MonoBehaviour
     private Attack attack;
     private Movement movement;
     private int destinationDamage;
+    private bool hasCustomPath;
 
     private void Awake()
     {
@@ -38,7 +40,7 @@ public class EnemyObject : MonoBehaviour
 
     private void Update()
     {
-        if (EnemyDestination.Instance != null)
+        if (!hasCustomPath && EnemyDestination.Instance != null)
             movement.SetDestination(EnemyDestination.Instance.transform);
 
         if (blockingUnit != null && !blockingUnit.IsDead)
@@ -47,6 +49,20 @@ public class EnemyObject : MonoBehaviour
         blockingUnit = null;
         attack.SetPriorityTarget(null);
         movement.SetBlocked(false);
+    }
+
+    public void ConfigurePath(GridEdge spawnEdge, EnemyPathMode pathMode)
+    {
+        hasCustomPath = pathMode == EnemyPathMode.StraightThenTurn;
+        if (!hasCustomPath || movement == null || EnemyDestination.Instance == null)
+            return;
+
+        Vector2 destinationPosition = EnemyDestination.Instance.transform.position;
+        Vector2 firstCorner = spawnEdge is GridEdge.Bottom or GridEdge.Top
+            ? new Vector2(transform.position.x, destinationPosition.y)
+            : new Vector2(destinationPosition.x, transform.position.y);
+
+        movement.SetWaypoints(firstCorner, destinationPosition);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -71,5 +87,10 @@ public class EnemyObject : MonoBehaviour
 
         destination.ReceiveEnemy(destinationDamage);
         Destroy(gameObject);
+    }
+
+    private void OnDestroy()
+    {
+        Destroyed?.Invoke(this);
     }
 }
